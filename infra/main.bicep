@@ -20,6 +20,9 @@ param location string
 // }
 param resourceGroupName string = ''
 
+// serviceName is used as value for the tag (azd-service-name) azd uses to identify deployment host
+param serviceName string = 'web'
+
 var abbrs = loadJsonContent('./abbreviations.json')
 
 // tags that should be applied to all resources.
@@ -58,7 +61,7 @@ module webApp 'modules/app-service/app-service.bicep' = {
   scope: resourceGroup(rg.name)
   params: {
     location: location
-    applicationName: applicationName
+    applicationName: serviceName
     environment: environmentName
     resourceTags: tags
     instanceNumber: resourceToken
@@ -79,8 +82,8 @@ module webApp 'modules/app-service/app-service.bicep' = {
 // Outputs are automatically saved in the local azd environment .env file.
 // To see these outputs, run `azd env get-values`,  or `azd env get-values --output json` for json output.
 
-output application_name string = webApp.outputs.application_name
-output application_url string = webApp.outputs.application_url
-output resource_group string = rg.name
+output APPLICATION_NAME string = webApp.outputs.application_name
+output APPLICATION_URL string = webApp.outputs.application_url
+output AZURE_RESOURCE_GROUP string = rg.name
 output AZURE_LOCATION string = location
 output AZURE_TENANT_ID string = tenant().tenantId
