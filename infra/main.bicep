@@ -7,7 +7,7 @@ targetScope = 'subscription'
 @minLength(1)
 @maxLength(64)
 @description('Name of the the environment which is used to generate a short unique hash used in all resources.')
-param environmentName string
+param environmentName string = 'dev'
 
 @minLength(1)
 @description('Primary location for all resources')
@@ -26,6 +26,7 @@ var abbrs = loadJsonContent('./abbreviations.json')
 var tags = {
   // Tag all resources with the environment name.
   'azd-env-name': environmentName
+  location: location
 }
 
 // Generate a unique token to be used in naming resources.
@@ -39,20 +40,35 @@ var resourceToken = toLower(uniqueString(subscription().id, environmentName, loc
 // Example usage:
 //   tags: union(tags, { 'azd-service-name': apiServiceName })
 #disable-next-line no-unused-vars
-var apiServiceName = 'python-api'
+var applicationName = 'dotnet-api'
 
 // Organize resources in a resource group
 resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-  name: !empty(resourceGroupName) ? resourceGroupName : '${abbrs.resourcesResourceGroups}${environmentName}'
+  name: !empty(resourceGroupName) ? resourceGroupName : '${abbrs.resourcesResourceGroups}${environmentName}${resourceToken}'
   location: location
   tags: tags
+}
+
+var applicationEnvironmentVariables = [
+  // You can add your custom environment variables here
+]
+
+module webApp 'modules/app-service/app-service.bicep' = {
+  name: 'webApp'
+  scope: resourceGroup(rg.name)
+  params: {
+    location: location
+    applicationName: applicationName
+    environment: environmentName
+    resourceTags: tags
+    instanceNumber: resourceToken
+    environmentVariables: applicationEnvironmentVariables
+  }
 }
 
 // Add resources to be provisioned below.
 // A full example that leverages azd bicep modules can be seen in the todo-python-mongo template:
 // https://github.com/Azure-Samples/todo-python-mongo/tree/main/infra
-
-
 
 // Add outputs from the deployment here, if needed.
 //
@@ -62,5 +78,9 @@ resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
 //
 // Outputs are automatically saved in the local azd environment .env file.
 // To see these outputs, run `azd env get-values`,  or `azd env get-values --output json` for json output.
+
+output application_name string = webApp.outputs.application_name
+output application_url string = webApp.outputs.application_url
+output resource_group string = rg.name
 output AZURE_LOCATION string = location
 output AZURE_TENANT_ID string = tenant().tenantId
