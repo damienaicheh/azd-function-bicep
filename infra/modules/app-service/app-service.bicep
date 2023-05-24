@@ -20,7 +20,7 @@ param resourceTags object
 
 var abbrs = loadJsonContent('./../../abbreviations.json')
 
-var appServicePlanName = '${abbrs.webServerFarms}-${applicationName}-${instanceNumber}'
+var appServicePlanName = '${abbrs.webServerFarms}${applicationName}-${instanceNumber}'
 
 resource appServicePlan 'Microsoft.Web/serverFarms@2020-12-01' = {
   name: appServicePlanName
@@ -38,7 +38,7 @@ resource appServicePlan 'Microsoft.Web/serverFarms@2020-12-01' = {
 
 // Reference: https://docs.microsoft.com/azure/templates/microsoft.web/sites?tabs=bicep
 resource appServiceApp 'Microsoft.Web/sites@2020-12-01' = {
-  name: '${abbrs.webSitesAppService}-${applicationName}-${environment}-${instanceNumber}'
+  name: '${abbrs.webSitesAppService}${applicationName}-${environment}-${instanceNumber}'
   location: location
   tags: resourceTags
   properties: {

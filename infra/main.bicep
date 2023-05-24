@@ -11,7 +11,7 @@ param environmentName string = 'dev'
 
 @minLength(1)
 @description('Primary location for all resources')
-param location string
+param location string = 'westeurope'
 
 // Optional parameters to override the default azd resource naming conventions.
 // Add the following to main.parameters.json to provide values:
@@ -47,7 +47,7 @@ var applicationName = 'dotnet-api'
 
 // Organize resources in a resource group
 resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-  name: !empty(resourceGroupName) ? resourceGroupName : '${abbrs.resourcesResourceGroups}${environmentName}${resourceToken}'
+  name: !empty(resourceGroupName) ? resourceGroupName : '${abbrs.resourcesResourceGroups}${environmentName}-${resourceToken}'
   location: location
   tags: tags
 }

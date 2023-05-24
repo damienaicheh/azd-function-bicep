@@ -1,6 +1,6 @@
 name: azd-project
 services:
   web:
-    project: ./TodoApi
-    language: csharp
-    host: appservice
+   project: ./TodoApi
+   language: csharp
+   host: appservice
